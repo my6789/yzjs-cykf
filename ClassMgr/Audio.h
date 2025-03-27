@@ -5,8 +5,15 @@
 #include <QtMultimedia/QMediaDevices>
 #include <QtMultimedia/QAudioSource>
 #include <QtMultimedia/QAudioDevice>
+#include <include/libavcodec/avcodec.h>
+#include <include/libavformat/avformat.h>
+#include <include/libavutil/avutil.h>
+#include <include/libavutil/opt.h>
+#include <include/libswresample/swresample.h>
 using namespace std;
 using namespace std::filesystem;
+
+
 
 enum TaskStatus {
 	Waiting, Recording, Converting, Completed,
