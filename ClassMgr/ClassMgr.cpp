@@ -41,18 +41,22 @@ void ClassMgr::leaveEvent(QEvent* event)
 void ClassMgr::startRecord()
 {
     if (!isRecording) {
+        string file_extension = ".pcm";
         au_form.setSampleRate(44100);
-        au_form.setChannelCount(1);
+        au_form.setChannelCount(2);
         au_form.setSampleFormat(QAudioFormat::Int16);
+
+        qDebug() << au_form.bytesPerFrame();
+
         if (!exists(au_save_default)) {
             create_directories(au_save_default);
         }
-        path save_path = au_save_default / (to_string(clock()) + ".pcm");
+        path save_path = au_save_default / (to_string(time(nullptr)) + file_extension);
         for (int i = 0;; i++) {
             if (!exists(save_path)) {
                 break;
             }
-            save_path = au_save_default / (to_string(clock()) + to_string(i) + ".pcm");
+            save_path = au_save_default / (to_string(time(nullptr)) + to_string(i) + file_extension);
         }
         AudioFile* au_file = new AudioFile(au_form);
         task_list.push_back(au_file->start(save_path));
@@ -72,53 +76,5 @@ void ClassMgr::stopRecord()
     }
 }
 
-//AudioFile functions
 
-AudioFile::AudioFile(const QAudioFormat& format)
-{
-    open(QIODevice::WriteOnly);
-    file = nullptr;
-}
-
-AudioFile::~AudioFile()
-{
-    stop();
-}
-
-AudioTask* AudioFile::start(const path& file_path)
-{
-    file = new fstream(file_path, ios_base::out | ios_base::trunc);
-    if (file == nullptr) {
-        throw exception("failed to open file!");
-    }
-    task = new AudioTask(file_path);
-    if (task == nullptr) {
-        throw exception("failed to create task!");
-        delete file;
-    }
-    task->status = TaskStatus::Recording;
-    return task;
-}
-
-void AudioFile::stop()
-{
-    close();
-    if (!file->is_open()) {
-        file->close();
-    }
-    if (file != nullptr) {
-        delete file;
-    }
-}
-
-qint64 AudioFile::readData(char* data, qint64 maxlen)
-{
-    return 0;
-}
-
-qint64 AudioFile::writeData(const char* data, qint64 len)
-{
-    file->write(data, len);
-    return len;
-}
 

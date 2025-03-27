@@ -2,16 +2,11 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QtMultimedia/QScreenCapture>
-#include <QtMultimedia/QMediaDevices>
-#include <QtMultimedia/QAudioSource>
-#include <QtMultimedia/QAudioDevice>
-#include <QIODevice>
 #include <filesystem>
-#include <fstream>
 #include <time.h>
 #include <vector>
 #include <qDebug>
-#include "AudioTask.h"
+#include "Audio.h"
 #include "ui_ClassMgr.h"
 using namespace std::filesystem;
 using namespace std;
@@ -44,20 +39,3 @@ private:
     Ui::ClassMgrClass ui;
 };
 
-class AudioFile :public QIODevice
-{
-    Q_OBJECT
-
-public:
-    AudioFile(const QAudioFormat& format);
-    ~AudioFile();
-    AudioTask* start(const path&);
-    void stop();
-    qint64 readData(char* data, qint64 maxlen) override;
-    qint64 writeData(const char* data, qint64 len) override;
-
-private:
-    AudioTask* task;
-    const QAudioFormat m_format;
-    fstream* file;
-};
